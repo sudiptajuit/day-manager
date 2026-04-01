@@ -27,11 +27,12 @@ async function verifyAuth(req: NextRequest) {
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth(req);
-    const todoId = parseInt(params.id);
+    const { id } = await context.params;
+    const todoId = parseInt(id);
 
     if (isNaN(todoId)) {
       throw new ApiError({
@@ -69,7 +70,9 @@ export async function PUT(
           description: description ? description.trim() : null,
         }),
         ...(completed !== undefined && { completed }),
-        ...(dueDate !== undefined && { dueDate: dueDate ? new Date(dueDate) : null }),
+        ...(dueDate !== undefined && {
+          dueDate: dueDate ? new Date(dueDate) : null,
+        }),
       },
     });
 
@@ -81,11 +84,12 @@ export async function PUT(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const auth = await verifyAuth(req);
-    const todoId = parseInt(params.id);
+    const { id } = await context.params;
+    const todoId = parseInt(id);
 
     if (isNaN(todoId)) {
       throw new ApiError({
